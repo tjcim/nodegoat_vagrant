@@ -1,0 +1,91 @@
+---
+- hosts: all
+  vars:
+    working_dir: "/home/vagrant"
+  tasks:
+    - name: update box
+      apt:
+        update_cache: True
+      become: True
+
+    - name: Download node setup script
+      get_url:
+        url: https://deb.nodesource.com/setup_13.x
+        dest: "{{ working_dir }}/nodegoat_setup.sh"
+        mode: 0755
+
+    - name: Run node setup script
+      command: "{{ working_dir }}/nodegoat_setup.sh"
+      become: True
+
+    - name: Install nodejs
+      apt:
+        name: nodejs
+        update_cache: True
+      become: True
+
+    - name: Clone NodeGoat
+      git:
+        repo: "https://github.com/OWASP/NodeGoat.git"
+        dest: "{{ working_dir }}/nodegoat"
+        force: yes
+
+    - name: Install NodeGoat Dependencies
+      npm:
+        path: "{{ working_dir }}/nodegoat"
+
+    - name: Install MongoDB repo key
+      apt_key:
+        url: "https://www.mongodb.org/static/pgp/server-4.2.asc"
+        state: present
+      become: True
+
+    - name: Add MongoDB repository
+      apt_repository:
+        repo: "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.2 multiverse"
+        update_cache: True
+      become: True
+
+    - name: Install MongoDB
+      apt:
+        name: mongodb-org
+      become: True
+
+    - name: Start MongoDB
+      service:
+        name: mongod
+        state: started
+      become: True
+
+    - name: Uncomment database connection in development.js
+      lineinfile:
+        dest: "{{ working_dir }}/nodegoat/config/env/development.js"
+        regexp: '^\s*//\s*db:\s*\"mongodb://localhost:27017/nodegoat\".*$'
+        line: '   db: "mongodb://localhost:27017/nodegoat",'
+
+    - name: Run db:seed
+      command:
+        cmd: "npm run db:seed"
+        chdir: "{{ working_dir }}/nodegoat"
+
+    - name: Install pm2
+      npm:
+        name: pm2
+        global: True
+      become: True
+
+    - name: Use pm2 to Start Application
+      command:
+        cmd: "pm2 start server.js"
+        chdir: "{{ working_dir }}/nodegoat"
+
+    - name: Configure pm2 to start app with systemd
+      command:
+        cmd: "pm2 startup systemd"
+        chdir: "{{ working_dir }}/nodegoat"
+      become: True
+
+    - name: Save pm2 config
+      command:
+        cmd: "pm2 save"
+        chdir: "{{ working_dir }}/nodegoat"
