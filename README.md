@@ -1,9 +1,5 @@
 # NodeGoat
 
-!!!note
-  Requires host machine to have vagrant and ansible installed.
-
-
 OWASP App to learn security issues on a node.js server: [NodeGoat](https://github.com/OWASP/NodeGoat)
 
 ## Getting Started
@@ -14,7 +10,7 @@ OWASP App to learn security issues on a node.js server: [NodeGoat](https://githu
 Clone the repo:
 
 ``` bash
-git clone https://tjcim/nodegoat_vagrant && cd nodegoat_vagrant
+git clone https://github.comtjcim/nodegoat_vagrant && cd nodegoat_vagrant
 ```
 
 Start the vagrant guest:
