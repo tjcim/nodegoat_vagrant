@@ -10,7 +10,7 @@ OWASP App to learn security issues on a node.js server: [NodeGoat](https://githu
 Clone the repo:
 
 ``` bash
-git clone https://github.comtjcim/nodegoat_vagrant && cd nodegoat_vagrant
+git clone https://github.com/tjcim/nodegoat_vagrant && cd nodegoat_vagrant
 ```
 
 Start the vagrant guest:
@@ -28,7 +28,7 @@ Stop app
 pm2 stop server
 ```
 
-restart App
+Restart App
 ``` bash
 pm2 restart server
 ```
